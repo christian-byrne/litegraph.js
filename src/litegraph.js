@@ -9958,6 +9958,22 @@ LGraphNode.prototype.executeAction = function(action)
 								if(values && values.constructor !== Array)
 									v = values[ w.value ];
 							}
+                            const labelWidth = ctx.measureText(w.label || w.name).width + margin * 2;
+                            const inputWidth = widget_width - margin * 4
+                            const availableWidth = inputWidth - labelWidth
+                            const textWidth = ctx.measureText(v).width;
+                            if (textWidth > availableWidth) {
+                                const ellipsis = "...";
+                                const ellipsisWidth = ctx.measureText(ellipsis).width;
+                                if (availableWidth <= ellipsisWidth) {
+                                    v = ellipsis;
+                                } else {
+                                    while (ctx.measureText(v).width + ellipsisWidth > availableWidth) {
+                                        v = v.substr(0, v.length - 1);
+                                    }
+                                    v += ellipsis;
+                                }
+                            } 
                             ctx.fillText(
                                 v,
                                 widget_width - margin * 2 - 20,
