@@ -146,6 +146,8 @@
         // use this if you must have node IDs that are unique across all graphs and subgraphs.
         use_uuids: false,
 
+        context_menu_has_scrollbars: false, // clip context menus that are too big for the screen and add scrollbars
+
         /**
          * Register a node class so it can be listed when the user wants to create a new one
          * @method registerNodeType
@@ -13879,6 +13881,15 @@ LGraphNode.prototype.executeAction = function(action)
 
         root.style.left = left + "px";
         root.style.top = top + "px";
+        if (context_menu_has_scrollbars) {
+            root.style.overflowY = "auto";
+            const deltaHeight = options.scale * root_rect.height - root_rect.height;
+            const deltaY = .5 * deltaHeight * (1 / options.scale);
+            const padY = 70 * options.scale;
+            const availableHeight = body_rect.height - (top + deltaY + padY);
+            const maxHeight = Math.max(Math.min(availableHeight, body_rect.height), 100);
+            root.style.maxHeight = maxHeight + "px"
+        }
 
         if (options.scale) {
             root.style.transform = "scale(" + options.scale + ")";
