@@ -10151,8 +10151,8 @@ LGraphNode.prototype.executeAction = function(action)
                             const promptOptions = {
                                 inputType: "number",
                                 step: w.options.step || 1,
-                                min: w.options.min || -Infinity,
-                                max: w.options.max || Infinity,
+                                min: w.options.min ?? -Infinity,
+                                max: w.options.max ?? Infinity,
                             }
 							this.prompt("Value",w.value,function(v) {
 									// check if v is a valid equation or a number
