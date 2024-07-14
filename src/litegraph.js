@@ -11436,6 +11436,15 @@ LGraphNode.prototype.executeAction = function(action)
             input.focus();
         }, 10);
 
+        setTimeout(function() {
+            canvas.parentNode.addEventListener("click", function onmouseclick(e) {
+                if (e.target == canvas) {
+                    dialog.close();
+                    canvas.parentNode.removeEventListener("click", onmouseclick);
+                }
+            });
+        }, 128);
+
         return dialog;
     };
 
