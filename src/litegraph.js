@@ -11455,14 +11455,16 @@ LGraphNode.prototype.executeAction = function(action)
         }, 10);
 
         setTimeout(function() {
-            canvas.parentNode.addEventListener("click", function onmouseclick(e) {
+            function handleEvent(e) {
                 if (e.target == canvas) {
                     dialog.close();
-                    canvas.parentNode.removeEventListener("click", onmouseclick);
                 }
-            });
+            }
+            const handlerOptions = { once: true, passive: true };
+            canvas.parentNode.addEventListener("click", handleEvent, handlerOptions);
+            canvas.parentNode.addEventListener("touchend", handleEvent, handlerOptions);
         }, 128);
-
+        
         return dialog;
     };
 
