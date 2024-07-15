@@ -11458,11 +11458,12 @@ LGraphNode.prototype.executeAction = function(action)
             function handleEvent(e) {
                 if (e.target == canvas) {
                     dialog.close();
+                    canvas.parentNode.removeEventListener("click", handleEvent);
+                    canvas.parentNode.removeEventListener("touchend", handleEvent);
                 }
             }
-            const handlerOptions = { once: true, passive: true };
-            canvas.parentNode.addEventListener("click", handleEvent, handlerOptions);
-            canvas.parentNode.addEventListener("touchend", handleEvent, handlerOptions);
+            canvas.parentNode.addEventListener("click", handleEvent, { passive: true });
+            canvas.parentNode.addEventListener("touchend", handleEvent, { passive: true });
         }, 128);
         
         return dialog;
