@@ -2164,46 +2164,48 @@ export class LGraphCanvas {
       this.ctx.lineWidth = this.connections_width + 7
       const dpi = window?.devicePixelRatio || 1
 
-      for (const linkSegment of this.renderedPaths) {
-        const centre = linkSegment._pos
-        if (!centre) continue
+      if (this.links_render_mode !== LinkRenderType.HIDDEN_LINK) {
+        for (const linkSegment of this.renderedPaths) {
+          const centre = linkSegment._pos
+          if (!centre) continue
 
-        // If we shift click on a link then start a link from that input
-        if (
-          (e.shiftKey || e.altKey) &&
-          linkSegment.path &&
-          this.ctx.isPointInStroke(linkSegment.path, x * dpi, y * dpi)
-        ) {
-          if (e.shiftKey && !e.altKey) {
-            const slot = linkSegment.origin_slot
-            const originNode = graph._nodes_by_id[linkSegment.origin_id]
+          // If we shift click on a link then start a link from that input
+          if (
+            (e.shiftKey || e.altKey) &&
+            linkSegment.path &&
+            this.ctx.isPointInStroke(linkSegment.path, x * dpi, y * dpi)
+          ) {
+            if (e.shiftKey && !e.altKey) {
+              const slot = linkSegment.origin_slot
+              const originNode = graph._nodes_by_id[linkSegment.origin_id]
 
-            const connecting: ConnectingLink = {
-              node: originNode,
-              slot,
-              pos: originNode.getConnectionPos(false, slot),
+              const connecting: ConnectingLink = {
+                node: originNode,
+                slot,
+                pos: originNode.getConnectionPos(false, slot),
+              }
+              this.connecting_links = [connecting]
+              if (linkSegment.parentId) connecting.afterRerouteId = linkSegment.parentId
+
+              pointer.onDragStart = () => connecting.output = originNode.outputs[slot]
+              // pointer.finally = () => this.connecting_links = null
+
+              return
+            } else if (this.reroutesEnabled && e.altKey && !e.shiftKey) {
+              const newReroute = graph.createReroute([x, y], linkSegment)
+              pointer.onDragStart = pointer => this.#startDraggingItems(newReroute, pointer)
+              pointer.onDragEnd = e => this.#processDraggedItems(e)
+              return
             }
-            this.connecting_links = [connecting]
-            if (linkSegment.parentId) connecting.afterRerouteId = linkSegment.parentId
+          } else if (isInRectangle(x, y, centre[0] - 4, centre[1] - 4, 8, 8)) {
+            pointer.onClick = () => this.showLinkMenu(linkSegment, e)
+            pointer.onDragStart = () => this.dragging_canvas = true
+            pointer.finally = () => this.dragging_canvas = false
 
-            pointer.onDragStart = () => connecting.output = originNode.outputs[slot]
-            // pointer.finally = () => this.connecting_links = null
-
-            return
-          } else if (this.reroutesEnabled && e.altKey && !e.shiftKey) {
-            const newReroute = graph.createReroute([x, y], linkSegment)
-            pointer.onDragStart = pointer => this.#startDraggingItems(newReroute, pointer)
-            pointer.onDragEnd = e => this.#processDraggedItems(e)
+            // clear tooltip
+            this.over_link_center = null
             return
           }
-        } else if (isInRectangle(x, y, centre[0] - 4, centre[1] - 4, 8, 8)) {
-          pointer.onClick = () => this.showLinkMenu(linkSegment, e)
-          pointer.onDragStart = () => this.dragging_canvas = true
-          pointer.finally = () => this.dragging_canvas = false
-
-          // clear tooltip
-          this.over_link_center = null
-          return
         }
       }
 
